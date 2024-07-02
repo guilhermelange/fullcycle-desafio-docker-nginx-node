@@ -1,16 +1,9 @@
-services:
-  app:
-    container_name: app
-    build:
-      context: ./node
-    entrypoint: dockerize -wait tcp://db:3306 -timeout 60s node index.js
-    depends_on:
-      - db
+name: guilhermelange-desafio
 
+services:
   db:
     image: mysql:5.7
     command: --innodb-use-native-aio=0
-    container_name: db
     restart: always
     volumes:
       - ./mysql:/var/lib/mysql
@@ -18,8 +11,14 @@ services:
       - MYSQL_DATABASE=nodedb
       - MYSQL_ROOT_PASSWORD=root
 
+  app:
+    build:
+      context: ./node
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 60s node index.js
+    depends_on:
+      - db
+      
   nginx:
-    container_name: nginx
     build:
       context: ./nginx
     ports:
