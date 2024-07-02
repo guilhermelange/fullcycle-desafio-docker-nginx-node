@@ -3,6 +3,7 @@ name: guilhermelange-desafio
 services:
   db:
     image: mysql:5.7
+    container_name: db
     command: --innodb-use-native-aio=0
     restart: always
     volumes:
@@ -14,12 +15,18 @@ services:
   app:
     build:
       context: ./node
+    container_name: app
     entrypoint: dockerize -wait tcp://db:3306 -timeout 60s node index.js
+    restart: always
     depends_on:
       - db
       
   nginx:
     build:
       context: ./nginx
+    restart: always
+    container_name: nginx
+    depends_on:
+      - app
     ports:
       - 8080:80
